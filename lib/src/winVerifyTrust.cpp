@@ -104,9 +104,10 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   Napi::Env env = info.Env();
 
   int length = info.Length();
-  if (length != 1 || !info[0].IsString())
+  if (length != 2 || !info[0].IsString() || !info[1].IsString() )
     Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
   Napi::String filePath = info[0].As<Napi::String>();
+  Napi::String publisName = info[2].As<Napi::String>();
 
   Napi::Object result = Napi::Object::New(env);
 
