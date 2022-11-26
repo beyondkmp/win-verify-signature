@@ -32,7 +32,7 @@ std::wstring stringToWString(const std::string &s)
   return buf;
 }
 
-static BOOL IsTrustedPublisherName(PCCERT_CHAIN_CONTEXT pChainContext, const wchar_t *publishName)
+static BOOL IsTrustedPublisherName(PCCERT_CHAIN_CONTEXT pChainContext, LPCWSTR publishName)
 {
   PCERT_SIMPLE_CHAIN pChain;
   PCCERT_CONTEXT pCertContext;
@@ -104,15 +104,17 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   Napi::Env env = info.Env();
 
   int length = info.Length();
-  if (length != 2 || !info[0].IsString() || !info[1].IsString() )
+  if (length != 2 || !info[0].IsString() || !info[1].IsString())
     Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
   Napi::String filePath = info[0].As<Napi::String>();
-  Napi::String publisName = info[2].As<Napi::String>();
-
+  Napi::String publishName = info[1].As<Napi::String>();
   Napi::Object result = Napi::Object::New(env);
 
   std::wstring wrapper = stringToWString(filePath);
   LPCWSTR pwszSourceFile = wrapper.c_str();
+
+  std::wstring wrapper2 = stringToWString(publishName);
+  LPCWSTR publishNameW = wrapper2.c_str();
 
   /*
   From https://docs.microsoft.com/en-us/windows/win32/seccrypto/example-c-program--verifying-the-signature-of-a-pe-file
@@ -246,12 +248,7 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
     goto Cleanup;
   }
 
-  if (!IsTrustedPublisherName(pProvSigner->pChainContext, L"RingCentral, Inc."))
-  {
-    result.Set("signed", false);
-    result.Set("message", "The publisher name is not trusted");
-    goto Cleanup;
-  }
+  if (!IsTrustedPublisherName(pProvSigner->pChainContext, publishNameW))
   {
     dwLastError = GetLastError();
     result.Set("signed", false);
