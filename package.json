@@ -1,5 +1,5 @@
 {
-  "name": "@xan105/win-verify-trust",
+  "name": "@beyondkmp/win-verify-trust",
   "version": "1.1.0",
   "description": "Check the signature of an executable file using the WinVerifyTrust API",
   "type": "module",
@@ -8,9 +8,6 @@
   "os": [
     "win32"
   ],
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "gypfile": true,
   "scripts": {
     "build": "node-gyp rebuild",
@@ -27,27 +24,27 @@
   ],
   "author": {
     "name": "Anthony Beaumont",
-    "email": "dev.xan105@outlook.be",
-    "url": "https://xan105.com/"
+    "email": "dev.beyondkmp@outlook.be",
+    "url": "https://beyondkmp.com/"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xan105/node-win-verify-trust.git"
+    "url": "git+https://github.com/beyondkmp/node-win-verify-trust.git"
   },
   "bugs": {
-    "url": "https://github.com/xan105/node-win-verify-trust/issues"
+    "url": "https://github.com/beyondkmp/node-win-verify-trust/issues"
   },
-  "homepage": "https://github.com/xan105/node-win-verify-trust#readme",
+  "homepage": "https://github.com/beyondkmp/node-win-verify-trust#readme",
   "devDependencies": {
     "eslint": "^8.11.0",
     "node-gyp": "^9.0.0",
     "tap": "^16.0.0"
   },
   "dependencies": {
-    "@xan105/error": "^1.2.0",
-    "@xan105/fs": "^2.0.4",
-    "@xan105/is": "^2.4.0",
+    "@beyondkmp/error": "^1.2.0",
+    "@beyondkmp/fs": "^2.0.4",
+    "@beyondkmp/is": "^2.4.0",
     "node-addon-api": "^4.3.0",
     "node-gyp-load": "^0.0.3"
   }
