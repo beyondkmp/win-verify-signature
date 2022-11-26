@@ -1,1 +1,6 @@
-export function verifySignatureByPublishName(filePath: string, publishName: string): Promise<boolean>;
+declare interface IStatus {
+  signed: boolean,
+  message: string
+}
+
+export function verifySignatureByPublishName(filePath: string): Promise<IStatus>;
