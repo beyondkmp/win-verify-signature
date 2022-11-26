@@ -42,9 +42,6 @@
     "tap": "^16.0.0"
   },
   "dependencies": {
-    "@beyondkmp/error": "^1.2.0",
-    "@beyondkmp/fs": "^2.0.4",
-    "@beyondkmp/is": "^2.4.0",
     "node-addon-api": "^4.3.0",
     "node-gyp-load": "^0.0.3"
   }
