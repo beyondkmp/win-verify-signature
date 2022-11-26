@@ -38,11 +38,9 @@
   "homepage": "https://github.com/beyondkmp/node-win-verify-trust#readme",
   "devDependencies": {
     "eslint": "^8.11.0",
-    "node-gyp": "^9.0.0",
     "tap": "^16.0.0"
   },
   "dependencies": {
     "node-addon-api": "^4.3.0",
-    "node-gyp-load": "^0.0.3"
   }
 }
