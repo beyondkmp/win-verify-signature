@@ -3,4 +3,4 @@ declare interface IStatus {
   message: string
 }
 
-export function verifySignatureByPublishName(filePath: string): Promise<IStatus>;
+export function verifySignatureByPublishName(filePath: string, publisherName: string): IStatus;
