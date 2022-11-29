@@ -1,5 +1,5 @@
 {
-  "name": "@beyondkmp/win-verify-trust",
+  "name": "win-verify-signature",
   "version": "1.1.0",
   "description": "Check the signature of an executable file using the WinVerifyTrust API",
   "exports": "./lib/index.js",
@@ -21,8 +21,8 @@
     "windows"
   ],
   "author": {
-    "name": "Anthony Beaumont",
-    "email": "dev.beyondkmp@outlook.be",
+    "name": "payne fu",
+    "email": "beyondkmp@gmail.com",
     "url": "https://beyondkmp.com/"
   },
   "license": "MIT",

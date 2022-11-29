@@ -8,7 +8,7 @@ Example
 
 ```js
 
-const verify = require("@beyondkmp/node-win-verify-trust");
+const verify = require("win-verify-signature");
 
 console.log( verify.verifySignature("path/to/file", "publisherName") ); 
 
