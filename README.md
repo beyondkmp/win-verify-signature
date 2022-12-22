@@ -25,8 +25,8 @@ console.log( verify.verifySignature("path/to/file", "publisherName") );
 ```
 declare interface IStatus {
   signed: boolean,
-  message: string
+  message: string,
+  signObject?: string
 }
-
 export function verifySignatureByPublishName(filePath: string, publisherName: string): IStatus;
 ```
