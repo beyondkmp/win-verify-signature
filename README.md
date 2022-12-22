@@ -10,12 +10,13 @@ Example
 
 const verify = require("win-verify-signature");
 
-console.log( verify.verifySignature("path/to/file", "publisherName") ); 
+console.log( verify.verifySignature("path/to/file", ["CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;"]) ); 
 
 /* Example: 
 {
   signed: true,
   message: "The file is signed and the signature was verified"
+  signObject: "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;"
 }
 */
 ```
