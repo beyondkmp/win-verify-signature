@@ -6,7 +6,8 @@
   "types": "./types/index.d.ts",
   "gypfile": true,
   "scripts": {
-    "build": "node-gyp rebuild",
+    "native_build": "node-gyp rebuild",
+    "install": "prebuild-install || node install.js",
     "clean": "node-gyp clean",
     "lint": "npx eslint --ignore-path .gitignore \"./**/*.{js,mjs}\"",
     "test": "tap --no-coverage"
