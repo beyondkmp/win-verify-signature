@@ -1,7 +1,7 @@
 About
 =====
 
-Check the signature of an _executable_ file using the WinVerifyTrust API.
+Check the signature of an _executable_ file using the WinVerifyTrust API
 
 Example
 =======
@@ -31,3 +31,6 @@ declare interface IStatus {
 }
 export function verifySignatureByPublishName(filePath: string, publisherName: string): IStatus;
 ```
+
+# Refer
+https://github.com/microsoft/Windows-classic-samples/blob/main/Samples/Win7Samples/security/cryptoapi/VerifyNameTrust/VerifyNameTrust/VerifyNameTrust.cpp
