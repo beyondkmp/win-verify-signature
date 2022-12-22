@@ -29,7 +29,8 @@ t.test("isSigned()", async (t) => {
       ]),
       {
         signed: true,
-        message: "Signature validated using only CN Microsoft Corporation. Please add your full Distinguished Name (DN) to publisherNames configuration",
+        message:
+          "Signature validated using only CN Microsoft Corporation. Please add your full Distinguished Name (DN) to publisherNames configuration",
         signObject:
           "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;",
       }
