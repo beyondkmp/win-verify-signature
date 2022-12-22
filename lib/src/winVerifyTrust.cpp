@@ -21,101 +21,175 @@ found in the LICENSE file in the root directory of this source tree.
 using namespace std;
 #include <iostream>
 
-std::wstring stringToWString(const std::string &s)
+//+-------------------------------------------------------------------------
+//  Subject Name Attributes Used to Identify My Publisher Certificates
+//--------------------------------------------------------------------------
+static const LPCSTR PublisherAttributeObjId[] = {
+    // 0 - CN=
+    szOID_COMMON_NAME,
+    // 1 - O=
+    szOID_ORGANIZATION_NAME,
+
+    // 2 - L=
+    szOID_LOCALITY_NAME,
+
+    // 3 - S=
+    szOID_STATE_OR_PROVINCE_NAME,
+
+    // 4 - C=
+    szOID_COUNTRY_NAME,
+};
+
+//+-------------------------------------------------------------------------
+//  Subject name attributes of my publisher certificates
+//
+//  The name attributes are obtained by executing the following
+//  command for each publisher*.cer file:
+//
+//  >certutil -v contoso.cer
+//
+//  X509 Certificate:
+//
+//  ...
+//
+//  Subject:
+//    CN=Contoso
+
+//    O=Contoso
+//    L=Redmond
+//    S=Washington
+//    C=US
+//
+//--------------------------------------------------------------------------
+static const LPCWSTR PublisherNameList[] = {
+    // 0 - CN=
+    L"CN=",
+
+    // 1 - O=
+    L"O=",
+
+    // 2 - L=
+    L"L=",
+
+    // 3 - S=
+    L"S=",
+
+    // 4 - C=
+    L"C="};
+
+#define PUBLISHER_NAME_LIST_CNT (sizeof(PublisherNameList) / sizeof(PublisherNameList[0]))
+
+wstring StringToWString(const string &str)
 {
-  int length;
-  int slength = (int)s.length() + 1;
-  length = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
-  std::wstring buf;
-  buf.resize(length);
-  MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, const_cast<wchar_t *>(buf.c_str()), length);
-  return buf;
+  wstring wstr;
+  size_t size;
+  wstr.resize(str.length());
+  mbstowcs_s(&size, &wstr[0], wstr.size() + 1, str.c_str(), str.size());
+  return wstr;
 }
 
-static BOOL IsTrustedPublisherName(PCCERT_CHAIN_CONTEXT pChainContext, LPCWSTR publishName)
+string WStringToString(const wstring &wstr)
+{
+  string str;
+  size_t size;
+  str.resize(wstr.length());
+  wcstombs_s(&size, &str[0], str.size() + 1, wstr.c_str(), wstr.size());
+  return str;
+}
+
+static wstring IsTrustedPublisherName(
+    PCCERT_CHAIN_CONTEXT pChainContext)
 {
   PCERT_SIMPLE_CHAIN pChain;
   PCCERT_CONTEXT pCertContext;
+
   //
   // Get the publisher's certificate from the chain context
   //
+
   pChain = pChainContext->rgpChain[0];
   pCertContext = pChain->rgpElement[0]->pCertContext;
 
-  LPWSTR AttrString = NULL;
-  DWORD AttrStringLength;
-  BOOL trusted = TRUE;
-
   //
-  // First pass call to get the length of the subject name attribute.
-  // Note, the returned length includes the NULL terminator.
+  // Loop through the list of publisher subject names to be matched
   //
 
-  AttrStringLength = CertGetNameStringW(
-      pCertContext,
-      CERT_NAME_ATTR_TYPE,
-      0, // dwFlags
-      (void *)szOID_ORGANIZATION_NAME,
-      NULL, // AttrString
-      0);
-  // AttrStringLength
-
-  if (AttrStringLength <= 1)
+  wstring result;
+  // Loop through the subject name attributes to be matched.
+  // For example,CN=; O= ; L= ; S= ; C= ;
+  for (DWORD j = 0; j < 5; j++)
   {
+    LPWSTR AttrString = NULL;
+    DWORD AttrStringLength;
+
     //
-    // A matching certificate must have all of the attributes
+    // First pass call to get the length of the subject name attribute.
+    // Note, the returned length includes the NULL terminator.
     //
 
-    return FALSE;
+    AttrStringLength = CertGetNameStringW(
+        pCertContext,
+        CERT_NAME_ATTR_TYPE,
+        0, // dwFlags
+        (void *)PublisherAttributeObjId[j],
+        NULL, // AttrString
+        0);   // AttrStringLength
+
+    if (AttrStringLength <= 1)
+    {
+      //
+      // A matching certificate must have all of the attributes
+      //
+
+      return result;
+    }
+
+    AttrString = (LPWSTR)LocalAlloc(
+        LPTR,
+        AttrStringLength * sizeof(WCHAR));
+    if (AttrString == NULL)
+    {
+      return result;
+    }
+
+    //
+    // Second pass call to get the subject name attribute
+    //
+
+    AttrStringLength = CertGetNameStringW(
+        pCertContext,
+        CERT_NAME_ATTR_TYPE,
+        0, // dwFlags
+        (void *)PublisherAttributeObjId[j],
+        AttrString,
+        AttrStringLength);
+
+    if (AttrStringLength <= 1)
+    {
+      // The subject name attribute doesn't match
+      LocalFree(AttrString);
+      continue;
+    }
+
+    wstring mywstring(AttrString);
+    result += PublisherNameList[j] + mywstring + L";";
+    LocalFree(AttrString);
   }
 
-  AttrString = (LPWSTR)LocalAlloc(
-      LPTR,
-      AttrStringLength * sizeof(WCHAR));
-  if (AttrString == NULL)
-  {
-    return FALSE;
-  }
-
-  //
-  // Second pass call to get the subject name attribute
-  //
-
-  AttrStringLength = CertGetNameStringW(
-      pCertContext,
-      CERT_NAME_ATTR_TYPE,
-      0, // dwFlags
-      (void *)szOID_ORGANIZATION_NAME,
-      AttrString,
-      AttrStringLength);
-
-  if (AttrStringLength <= 1 || 0 != wcscmp(AttrString, publishName))
-  {
-    // The subject name attribute doesn't match
-    trusted = FALSE;
-  }
-
-  LocalFree(AttrString);
-  return trusted;
+  return result;
 }
 
 Napi::Object verifySignature(const Napi::CallbackInfo &info)
 {
   Napi::Env env = info.Env();
-
   int length = info.Length();
-  if (length != 2 || !info[0].IsString() || !info[1].IsString())
+  if (length != 1 || !info[0].IsString())
     Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
   Napi::String filePath = info[0].As<Napi::String>();
-  Napi::String publishName = info[1].As<Napi::String>();
   Napi::Object result = Napi::Object::New(env);
 
-  std::wstring wrapper = stringToWString(filePath);
+  std::wstring wrapper = StringToWString(filePath);
   LPCWSTR pwszSourceFile = wrapper.c_str();
-
-  std::wstring wrapper2 = stringToWString(publishName);
-  LPCWSTR publishNameW = wrapper2.c_str();
-
   /*
   From https://docs.microsoft.com/en-us/windows/win32/seccrypto/example-c-program--verifying-the-signature-of-a-pe-file
   Copyright (C) Microsoft. All rights reserved.
@@ -124,6 +198,7 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
 
   LONG lStatus;
   DWORD dwLastError;
+  wstring signObject;
 
   // Initialize the WINTRUST_FILE_INFO structure.
 
@@ -229,7 +304,6 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   CRYPT_PROVIDER_DATA *pProvData = WTHelperProvDataFromStateData(WinTrustData.hWVTStateData);
   if (NULL == pProvData)
   {
-    dwLastError = GetLastError();
     result.Set("signed", false);
     result.Set("message", "pProvData is null");
     goto Cleanup;
@@ -242,26 +316,27 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   CRYPT_PROVIDER_SGNR *pProvSigner = WTHelperGetProvSignerFromChain(pProvData, 0, FALSE, 0);
   if (NULL == pProvSigner)
   {
-    dwLastError = GetLastError();
     result.Set("signed", false);
     result.Set("message", "pProvSigner is null");
     goto Cleanup;
   }
 
-  if (!IsTrustedPublisherName(pProvSigner->pChainContext, publishNameW))
+  signObject = IsTrustedPublisherName(pProvSigner->pChainContext);
+  if (signObject.empty())
   {
-    dwLastError = GetLastError();
     result.Set("signed", false);
-    result.Set("message", "IsTrustedPublisherName is false");
+    result.Set("message", "sign info is empty");
     goto Cleanup;
+  }
+  else
+  {
+    result.Set("signObject", WStringToString(signObject));
   }
 
 Cleanup:
   // Any hWVTStateData must be released by a call with close.
   WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
-
   lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
-
   return result;
 }
 

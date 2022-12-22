@@ -1,30 +1,55 @@
-import { isSigned, trustStatus } from "../lib/index.js";
-import { resolve } from "node:path";
-import t from "tap";
+const verify = require("../lib/index.js");
+const path = require("path");
+const t = require("tap");
 
 const sample = {
-  signed: resolve("./test/sample/signed.dll"),
-  unsigned: resolve("./test/sample/unsigned.dll"),
-  enoent: resolve("./test/sample/idontexist.dll"),
-  ext: resolve("./test/sample/empty.txt")
+  signed: path.resolve("./test/sample/signed.exe"),
+  unsigned: path.resolve("./test/sample/unsigned.dll"),
+  ext: path.resolve("./test/sample/empty.txt"),
 };
 
-t.test('isSigned()', async t => {
-
-  await t.test('test file is signed', async t => t.strictSame(await isSigned(sample.signed), true));
-  await t.test('test file is not signed', async t => t.strictSame(await isSigned(sample.unsigned), false));
-  await t.test('test file does not exist', async t => t.rejects(isSigned(sample.enoent), "ERR_NO_SUCH_FILE"));
-  await t.test('test disallowed file ext', async t => t.rejects(isSigned(sample.ext), "ERR_UNEXPECTED_FILE_TYPE"));
+t.test("isSigned()", async (t) => {
+  await t.test("test file is signed: full Distinguished Name", async (t) =>
+    t.strictSame(
+      await verify.verifySignatureByPublishName(sample.signed, [
+        "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US",
+      ]),
+      {
+        signed: true,
+        message: "The file is signed and the signature was verified",
+        signObject:
+          "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;",
+      }
+    )
+  );
+  await t.test("test file is signed: Common Name", async (t) =>
+    t.strictSame(
+      await verify.verifySignatureByPublishName(sample.signed, [
+        "Microsoft Corporation",
+      ]),
+      {
+        signed: true,
+        message: "Signature validated using only CN Microsoft Corporation. Please add your full Distinguished Name (DN) to publisherNames configuration",
+        signObject:
+          "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;",
+      }
+    )
+  );
+  await t.test("test file is not signed", async (t) =>
+    t.strictSame(
+      await verify.verifySignatureByPublishName(sample.unsigned, ["test"]),
+      { signed: false, message: "pProvSigner is null" }
+    )
+  );
+  await t.test("test file is not match: Common Name", async (t) =>
+    t.strictSame(
+      await verify.verifySignatureByPublishName(sample.signed, ["test"]),
+      {
+        signed: false,
+        message:
+          "Publisher name does not match test and CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;",
+      }
+    )
+  );
   t.end();
-  
-});
-
-t.test('trustStatus()', async t => {
-
-  await t.test('test file is signed', async t => t.strictSame(await trustStatus(sample.signed), "The file is signed and the signature was verified"));
-  await t.test('test file is not signed', async t => t.strictSame(await trustStatus(sample.unsigned), "The file is not signed"));
-  await t.test('test file does not exist', async t => t.rejects(trustStatus(sample.enoent), "ERR_NO_SUCH_FILE"));
-  await t.test('test disallowed file ext', async t => t.rejects(trustStatus(sample.ext), "ERR_UNEXPECTED_FILE_TYPE"));
-  t.end();
-  
 });
