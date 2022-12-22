@@ -10,7 +10,7 @@ Example
 
 const verify = require("win-verify-signature");
 
-console.log( verify.verifySignature("path/to/file", ["CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;"]) ); 
+console.log( verify.verifySignatureByPublishName("path/to/file", ["CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;"]) ); 
 
 /* Example: 
 {
