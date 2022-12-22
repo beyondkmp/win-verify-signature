@@ -1,6 +1,6 @@
 {
   "name": "win-verify-signature",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Check the signature of an executable file using the WinVerifyTrust API",
   "exports": "./lib/index.js",
   "types": "./types/index.d.ts",
