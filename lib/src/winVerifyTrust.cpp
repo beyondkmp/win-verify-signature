@@ -21,21 +21,75 @@ found in the LICENSE file in the root directory of this source tree.
 using namespace std;
 #include <iostream>
 
+// x500 key refers wincrpyt.h
+
+//  Key         Object Identifier               RDN Value Type(s)
+//  ---         -----------------               -----------------
+//  CN          szOID_COMMON_NAME               Printable, Unicode
+//  L           szOID_LOCALITY_NAME             Printable, Unicode
+//  O           szOID_ORGANIZATION_NAME         Printable, Unicode
+//  OU          szOID_ORGANIZATIONAL_UNIT_NAME  Printable, Unicode
+//  E           szOID_RSA_emailAddr             Only IA5
+//  Email       szOID_RSA_emailAddr             Only IA5
+//  C           szOID_COUNTRY_NAME              Only Printable
+//  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
+//  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
+//  STREET      szOID_STREET_ADDRESS            Printable, Unicode
+//  T           szOID_TITLE                     Printable, Unicode
+//  Title       szOID_TITLE                     Printable, Unicode
+//  G           szOID_GIVEN_NAME                Printable, Unicode
+//  GN          szOID_GIVEN_NAME                Printable, Unicode
+//  GivenName   szOID_GIVEN_NAME                Printable, Unicode
+//  I           szOID_INITIALS                  Printable, Unicode
+//  Initials    szOID_INITIALS                  Printable, Unicode
+//  SN          szOID_SUR_NAME                  Printable, Unicode
+//  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
+//  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
+
 //+-------------------------------------------------------------------------
 //  Subject Name Attributes Used to Identify My Publisher Certificates
 //--------------------------------------------------------------------------
 static const LPCSTR PublisherAttributeObjId[] = {
-    // 0 - CN=
+    //  CN          szOID_COMMON_NAME               Printable, Unicode
     szOID_COMMON_NAME,
-    // 1 - O=
-    szOID_ORGANIZATION_NAME,
-    // 2 - L=
+    //  L           szOID_LOCALITY_NAME             Printable, Unicode
     szOID_LOCALITY_NAME,
-    // 3 - S=
-    szOID_STATE_OR_PROVINCE_NAME,
-    // 4 - C=
+    //  O           szOID_ORGANIZATION_NAME         Printable, Unicode
+    szOID_ORGANIZATION_NAME,
+    //  OU          szOID_ORGANIZATIONAL_UNIT_NAME  Printable, Unicode
+    szOID_ORGANIZATIONAL_UNIT_NAME,
+    //  E           szOID_RSA_emailAddr             Only IA5
+    szOID_RSA_emailAddr,
+    //  Email       szOID_RSA_emailAddr             Only IA5
+    szOID_RSA_emailAddr,
+    //  C           szOID_COUNTRY_NAME              Only Printable
     szOID_COUNTRY_NAME,
-};
+    //  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
+    szOID_STATE_OR_PROVINCE_NAME,
+    //  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
+    szOID_STATE_OR_PROVINCE_NAME,
+    //  STREET      szOID_STREET_ADDRESS            Printable, Unicode
+    szOID_STREET_ADDRESS,
+    //  T           szOID_TITLE                     Printable, Unicode
+    szOID_TITLE,
+    //  Title       szOID_TITLE                     Printable, Unicode
+    szOID_TITLE,
+    //  G           szOID_GIVEN_NAME                Printable, Unicode
+    szOID_GIVEN_NAME,
+    //  GN          szOID_GIVEN_NAME                Printable, Unicode
+    szOID_GIVEN_NAME,
+    //  GivenName   szOID_GIVEN_NAME                Printable, Unicode
+    szOID_GIVEN_NAME,
+    //  I           szOID_INITIALS                  Printable, Unicode
+    szOID_INITIALS,
+    //  Initials    szOID_INITIALS                  Printable, Unicode
+    szOID_INITIALS,
+    //  SN          szOID_SUR_NAME                  Printable, Unicode
+    szOID_SUR_NAME,
+    //  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
+    szOID_DOMAIN_COMPONENT,
+    //  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
+    szOID_DEVICE_SERIAL_NUMBER};
 
 //+-------------------------------------------------------------------------
 //  Subject name attributes of my publisher certificates
@@ -58,20 +112,49 @@ static const LPCSTR PublisherAttributeObjId[] = {
 //    C=US
 //
 //--------------------------------------------------------------------------
-static const LPCWSTR PublisherNameList[] = {
-    // 0 - CN=
-    L"CN=",
-    // 1 - O=
-    L"O=",
-    // 2 - L=
-    L"L=",
-    // 3 - S=
-    L"S=",
-    // 4 - C=
-    L"C="
-};
+static const LPCWSTR PublisherAttributeObjKey[] = {
+    //  CN          szOID_COMMON_NAME               Printable, Unicode
+    L"CN",
+    //  L           szOID_LOCALITY_NAME             Printable, Unicode
+    L"L",
+    //  O           szOID_ORGANIZATION_NAME         Printable, Unicode
+    L"O",
+    //  OU          szOID_ORGANIZATIONAL_UNIT_NAME  Printable, Unicode
+    L"OU",
+    //  E           szOID_RSA_emailAddr             Only IA5
+    L"E",
+    //  Email       szOID_RSA_emailAddr             Only IA5
+    L"Email",
+    //  C           szOID_COUNTRY_NAME              Only Printable
+    L"C",
+    //  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
+    L"S",
+    //  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
+    L"ST",
+    //  STREET      szOID_STREET_ADDRESS            Printable, Unicode
+    L"STREET",
+    //  T           szOID_TITLE                     Printable, Unicode
+    L"T",
+    //  Title       szOID_TITLE                     Printable, Unicode
+    L"Title",
+    //  G           szOID_GIVEN_NAME                Printable, Unicode
+    L"G",
+    //  GN          szOID_GIVEN_NAME                Printable, Unicode
+    L"GN",
+    //  GivenName   szOID_GIVEN_NAME                Printable, Unicode
+    L"GivenName",
+    //  I           szOID_INITIALS                  Printable, Unicode
+    L"I",
+    //  Initials    szOID_INITIALS                  Printable, Unicode
+    L"Initials",
+    //  SN          szOID_SUR_NAME                  Printable, Unicode
+    L"SN",
+    //  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
+    L"DC",
+    //  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
+    L"SERIALNUMBER"};
 
-#define PUBLISHER_NAME_LIST_CNT (sizeof(PublisherNameList) / sizeof(PublisherNameList[0]))
+#define PUBLISHER_ATTRIBUTE_LIST_CNT (sizeof(PublisherAttributeObjKey) / sizeof(PublisherAttributeObjKey[0]))
 
 wstring StringToWString(const string &str)
 {
@@ -111,7 +194,7 @@ static wstring GetSignSubjectInfo(
   wstring subject;
   // Loop through the subject name attributes to be matched.
   // For example,CN=; O= ; L= ; S= ; C= ;
-  for (DWORD j = 0; j < PUBLISHER_NAME_LIST_CNT; j++)
+  for (DWORD j = 0; j < PUBLISHER_ATTRIBUTE_LIST_CNT; j++)
   {
     LPWSTR AttrString = NULL;
     DWORD AttrStringLength;
@@ -162,7 +245,7 @@ static wstring GetSignSubjectInfo(
     }
 
     wstring mywstring(AttrString);
-    subject += PublisherNameList[j] + mywstring + L",";
+    subject += PublisherNameList[j] + L"=\"" + mywstring + L"\",";
     LocalFree(AttrString);
   }
 
