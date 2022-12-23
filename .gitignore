@@ -1,4 +1,4 @@
+\!winVerifyTrust.node
 node_modules/
 build/
 .nyc_output/
-\!build/Release/winVerifyTrust.node
