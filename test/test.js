@@ -48,7 +48,7 @@ t.test("isSigned()", async (t) => {
       {
         signed: false,
         message:
-          "Publisher name does not match test and CN=Microsoft Corporation,O=Microsoft Corporation,L=Redmond,S=Washington,C=US;",
+          "Publisher name does not match test and CN=Microsoft Corporation,O=Microsoft Corporation,L=Redmond,S=Washington,C=US,",
       }
     )
   );

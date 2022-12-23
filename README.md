@@ -16,7 +16,7 @@ console.log( verify.verifySignatureByPublishName("path/to/file", ["CN=Microsoft 
 {
   signed: true,
   message: "The file is signed and the signature was verified"
-  signObject: "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;"
+  subject: "CN=Microsoft Corporation;O=Microsoft Corporation;L=Redmond;S=Washington;C=US;"
 }
 */
 ```
@@ -27,7 +27,7 @@ console.log( verify.verifySignatureByPublishName("path/to/file", ["CN=Microsoft 
 declare interface IStatus {
   signed: boolean,
   message: string,
-  signObject?: string
+  subject?: string
 }
 export function verifySignatureByPublishName(filePath: string, publisherName: string): IStatus;
 ```
