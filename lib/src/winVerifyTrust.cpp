@@ -29,13 +29,10 @@ static const LPCSTR PublisherAttributeObjId[] = {
     szOID_COMMON_NAME,
     // 1 - O=
     szOID_ORGANIZATION_NAME,
-
     // 2 - L=
     szOID_LOCALITY_NAME,
-
     // 3 - S=
     szOID_STATE_OR_PROVINCE_NAME,
-
     // 4 - C=
     szOID_COUNTRY_NAME,
 };
@@ -64,18 +61,15 @@ static const LPCSTR PublisherAttributeObjId[] = {
 static const LPCWSTR PublisherNameList[] = {
     // 0 - CN=
     L"CN=",
-
     // 1 - O=
     L"O=",
-
     // 2 - L=
     L"L=",
-
     // 3 - S=
     L"S=",
-
     // 4 - C=
-    L"C="};
+    L"C="
+};
 
 #define PUBLISHER_NAME_LIST_CNT (sizeof(PublisherNameList) / sizeof(PublisherNameList[0]))
 
@@ -117,7 +111,7 @@ static wstring IsTrustedPublisherName(
   wstring result;
   // Loop through the subject name attributes to be matched.
   // For example,CN=; O= ; L= ; S= ; C= ;
-  for (DWORD j = 0; j < 5; j++)
+  for (DWORD j = 0; j < PUBLISHER_NAME_LIST_CNT; j++)
   {
     LPWSTR AttrString = NULL;
     DWORD AttrStringLength;
@@ -172,7 +166,7 @@ static wstring IsTrustedPublisherName(
     }
 
     wstring mywstring(AttrString);
-    result += PublisherNameList[j] + mywstring + L";";
+    result += PublisherNameList[j] + mywstring + L",";
     LocalFree(AttrString);
   }
 
@@ -218,25 +212,18 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   memset(&WinTrustData, 0, sizeof(WinTrustData));
 
   WinTrustData.cbStruct = sizeof(WinTrustData);
-
   // Use default code signing EKU.
   WinTrustData.pPolicyCallbackData = NULL;
-
   // No data to pass to SIP.
   WinTrustData.pSIPClientData = NULL;
-
   // Disable WVT UI.
   WinTrustData.dwUIChoice = WTD_UI_NONE;
-
   // No revocation checking.
   WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
-
   // Verify an embedded signature on a file.
   WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
-
   // Verify action.
   WinTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
-
   // Verification sets this value.
   WinTrustData.hWVTStateData = NULL;
 
