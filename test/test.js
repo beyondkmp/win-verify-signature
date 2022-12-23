@@ -9,7 +9,7 @@ const sample = {
 };
 
 t.test("isSigned()", async (t) => {
-  await t.test("test file is signed: full Distinguished Name", async (t) =>
+  await t.test("test file is signed: full Distinguished Name: CN,O,L,S,C", async (t) =>
     t.strictSame(
       await verify.verifySignatureByPublishName(sample.signed, [
         "CN=Microsoft Corporation,O=Microsoft Corporation,L=Redmond,S=Washington,C=US",
@@ -18,7 +18,20 @@ t.test("isSigned()", async (t) => {
         signed: true,
         message: "The file is signed and the signature was verified",
         subject:
-          "CN=Microsoft Corporation,O=Microsoft Corporation,L=Redmond,S=Washington,C=US,",
+          "CN=\"Microsoft Corporation\",L=\"Redmond\",O=\"Microsoft Corporation\",OU=\"Microsoft Corporation\",C=\"US\",S=\"Washington\",ST=\"Washington\",SERIALNUMBER=\"230865+470561\",",
+      }
+    )
+  );
+  await t.test("test file is signed: full Distinguished Name: O,L,S,C", async (t) =>
+    t.strictSame(
+      await verify.verifySignatureByPublishName(sample.signed, [
+        "O=\"Microsoft Corporation\",L=Redmond,S=Washington,C=US",
+      ]),
+      {
+        signed: true,
+        message: "The file is signed and the signature was verified",
+        subject:
+          "CN=\"Microsoft Corporation\",L=\"Redmond\",O=\"Microsoft Corporation\",OU=\"Microsoft Corporation\",C=\"US\",S=\"Washington\",ST=\"Washington\",SERIALNUMBER=\"230865+470561\",",
       }
     )
   );
@@ -32,7 +45,7 @@ t.test("isSigned()", async (t) => {
         message:
           "Signature validated using only CN Microsoft Corporation. Please add your full Distinguished Name (DN) to publisherNames configuration",
         subject:
-          "CN=Microsoft Corporation,O=Microsoft Corporation,L=Redmond,S=Washington,C=US,",
+          "CN=\"Microsoft Corporation\",L=\"Redmond\",O=\"Microsoft Corporation\",OU=\"Microsoft Corporation\",C=\"US\",S=\"Washington\",ST=\"Washington\",SERIALNUMBER=\"230865+470561\",",
       }
     )
   );
@@ -48,7 +61,7 @@ t.test("isSigned()", async (t) => {
       {
         signed: false,
         message:
-          "Publisher name does not match test and CN=Microsoft Corporation,O=Microsoft Corporation,L=Redmond,S=Washington,C=US,",
+          "Publisher name does not match test and CN=\"Microsoft Corporation\",L=\"Redmond\",O=\"Microsoft Corporation\",OU=\"Microsoft Corporation\",C=\"US\",S=\"Washington\",ST=\"Washington\",SERIALNUMBER=\"230865+470561\",",
       }
     )
   );

@@ -245,7 +245,8 @@ static wstring GetSignSubjectInfo(
     }
 
     wstring mywstring(AttrString);
-    subject += PublisherNameList[j] + L"=\"" + mywstring + L"\",";
+    mywstring = L"=\"" + mywstring + L"\",";
+    subject += PublisherAttributeObjKey[j] + mywstring;
     LocalFree(AttrString);
   }
 
