@@ -1,7 +1,7 @@
 declare interface IStatus {
   signed: boolean;
   message: string;
-  signObject?: string;
+  subject?: string;
 }
 
 export function verifySignatureByPublishName(

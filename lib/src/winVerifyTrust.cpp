@@ -91,7 +91,7 @@ string WStringToString(const wstring &wstr)
   return str;
 }
 
-static wstring IsTrustedPublisherName(
+static wstring GetSignSubjectInfo(
     PCCERT_CHAIN_CONTEXT pChainContext)
 {
   PCERT_SIMPLE_CHAIN pChain;
@@ -108,7 +108,7 @@ static wstring IsTrustedPublisherName(
   // Loop through the list of publisher subject names to be matched
   //
 
-  wstring result;
+  wstring subject;
   // Loop through the subject name attributes to be matched.
   // For example,CN=; O= ; L= ; S= ; C= ;
   for (DWORD j = 0; j < PUBLISHER_NAME_LIST_CNT; j++)
@@ -131,11 +131,7 @@ static wstring IsTrustedPublisherName(
 
     if (AttrStringLength <= 1)
     {
-      //
-      // A matching certificate must have all of the attributes
-      //
-
-      return result;
+      continue;
     }
 
     AttrString = (LPWSTR)LocalAlloc(
@@ -143,7 +139,7 @@ static wstring IsTrustedPublisherName(
         AttrStringLength * sizeof(WCHAR));
     if (AttrString == NULL)
     {
-      return result;
+      continue;
     }
 
     //
@@ -166,11 +162,11 @@ static wstring IsTrustedPublisherName(
     }
 
     wstring mywstring(AttrString);
-    result += PublisherNameList[j] + mywstring + L",";
+    subject += PublisherNameList[j] + mywstring + L",";
     LocalFree(AttrString);
   }
 
-  return result;
+  return subject;
 }
 
 Napi::Object verifySignature(const Napi::CallbackInfo &info)
@@ -192,7 +188,7 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
 
   LONG lStatus;
   DWORD dwLastError;
-  wstring signObject;
+  wstring signSubject;
 
   // Initialize the WINTRUST_FILE_INFO structure.
 
@@ -308,16 +304,16 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
     goto Cleanup;
   }
 
-  signObject = IsTrustedPublisherName(pProvSigner->pChainContext);
-  if (signObject.empty())
+  signSubject = GetSignSubjectInfo(pProvSigner->pChainContext);
+  if (signSubject.empty())
   {
     result.Set("signed", false);
-    result.Set("message", "sign info is empty");
+    result.Set("message", "sign subject info is empty");
     goto Cleanup;
   }
   else
   {
-    result.Set("signObject", WStringToString(signObject));
+    result.Set("subject", WStringToString(signSubject));
   }
 
 Cleanup:
