@@ -31,7 +31,7 @@ t.test("isSigned()", async (t) => {
         signed: true,
         message: "The file is signed and the signature was verified",
         subject:
-          "CN=\"Microsoft Corporation\",L=\"Redmond\",O=\"Microsoft Corporation\",OU=\"Microsoft Corporation\",C=\"US\",S=\"Washington\",ST=\"Washington\",SERIALNUMBER=\"230865+470561\",",
+          'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",ST="Washington",SERIALNUMBER="230865+470561",',
       }
     )
   );
