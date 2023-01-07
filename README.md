@@ -57,7 +57,7 @@ declare interface IStatus {
   message: string,
   subject?: string
 }
-export function verifySignatureByPublishName(filePath: string, publisherName: string): IStatus;
+export function verifySignatureByPublishName(filePath: string, publisherName: string[]): IStatus;
 ```
 
 # Refer
