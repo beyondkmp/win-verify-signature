@@ -9,8 +9,6 @@ found in the LICENSE file in the root directory of this source tree.
 #define _UNICODE 1
 #define UNICODE 1
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <windows.h>
 #include <Softpub.h>
 #include <wincrypt.h>

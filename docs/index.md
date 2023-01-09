@@ -3,18 +3,25 @@
 ## API
 
 ```typescript
-import { is24hoursTimeFormat } from 'check-24-hours-time'
 
-// is24hoursTimeFormat returns true if system time is 24 hours. returns false if 12 hours
-const result = is24hoursTimeFormat()
-console.log(result)
+import 'verifySignatureByPublishName' from 'win-verify-signature';
+
+console.log( verifySignatureByPublishName("path/to/file", ['CN="Microsoft Corporation",O="Microsoft Corporation",L=Redmond,S=Washington,C=US"'])); 
+
+/* Example: 
+{
+  signed: true,
+  message: "The file is signed and the signature was verified"
+  subject: "CN=\"Microsoft Corporation\";O=\"Microsoft Corporation\";L=\"Redmond\";S=\"Washington\";C=\"US\";"
+}
+*/
 ```
 
 ## Setup
 
 ```shellsession
-$ git clone https://github.com/beyondkmp/check-24-hours-time.git
-$ cd check-24-hours-time
+$ git clone https://github.com/beyondkmp/win-verify-signature.git
+$ cd win-verify-signature
 $ yarn
 ```
 
@@ -33,4 +40,3 @@ with a recent version of Node:
       required by Node.js for installing native modules._
     - _Run `npm config set msvs_version 2019` to tell node to use this
       toolchain._
-- Xcode
