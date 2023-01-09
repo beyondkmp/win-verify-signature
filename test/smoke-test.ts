@@ -25,6 +25,8 @@ describe("getUserLocale", () => {
       signed: false,
       message:
         'Publisher name does not match test is here and CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
+      subject:
+        'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
     });
   });
 
@@ -33,8 +35,9 @@ describe("getUserLocale", () => {
       'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington"',
     ]);
     expect(result).toEqual({
-      message: "pProvSigner is null",
+      message: "The file is not signed",
       signed: false,
+      subject: "",
     });
   });
 
