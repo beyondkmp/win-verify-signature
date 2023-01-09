@@ -290,7 +290,7 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   // and Wintrust_Data.
   lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
 
-  result.Set('subject', "");
+  result.Set("subject", "");
   switch (lStatus)
   {
   case ERROR_SUCCESS:
