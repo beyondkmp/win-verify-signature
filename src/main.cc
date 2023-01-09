@@ -120,8 +120,7 @@ static const LPCWSTR PublisherAttributeObjKey[] = {
     //  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
     L"DC",
     //  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
-    L"SERIALNUMBER"
-};
+    L"SERIALNUMBER"};
 
 #define PUBLISHER_ATTRIBUTE_LIST_CNT (sizeof(PublisherAttributeObjKey) / sizeof(PublisherAttributeObjKey[0]))
 
@@ -291,6 +290,7 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   // and Wintrust_Data.
   lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
 
+  result.Set('subject', "");
   switch (lStatus)
   {
   case ERROR_SUCCESS:
@@ -335,6 +335,11 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
     result.Set("signed", false);
     result.Set("message", "The UI was disabled in dwUIChoice or the admin policy has disabled user trust");
     break;
+  }
+
+  if (lStatus != ERROR_SUCCESS)
+  {
+    goto Cleanup;
   }
 
   CRYPT_PROVIDER_DATA *pProvData = WTHelperProvDataFromStateData(WinTrustData.hWVTStateData);

@@ -3,7 +3,7 @@ const fs = require("fs");
 declare interface ISignStatus {
   signed: boolean;
   message: string;
-  subject?: string;
+  subject: string;
 }
 
 type NativeModule = {
@@ -12,7 +12,7 @@ type NativeModule = {
 
 // The native binary will be loaded lazily to avoid any possible crash at start
 // time, which are harder to trace.
-let _nativeModule: NativeModule | undefined = undefined;
+let _nativeModule: NativeModule;
 
 function getNativeModule() {
   _nativeModule = require("bindings")("win-verify-signature.node");
@@ -115,17 +115,11 @@ export function verifySignatureByPublishName(
   if (!allowed.includes(ext))
     throw Error(`Accepted file types are: ${allowed.join(",")}`);
   if (!fs.existsSync(filePath)) throw Error("Unable to locate target file");
-  const result = getNativeModule()?.verifySignature(filePath);
-  if (result === undefined || result === null) {
-    return {
-      signed: false,
-      message: "can't load native module and get the sign info",
-    };
-  }
+  const result = getNativeModule().verifySignature(filePath);
 
   if (result.signed === false) return result;
 
-  const subject = parseDn(result.subject || "");
+  const subject = parseDn(result.subject);
   let match = false;
   for (const name of publishNames) {
     const dn = parseDn(name);
@@ -140,11 +134,14 @@ export function verifySignatureByPublishName(
       match = true;
     }
   }
+
   if (match) {
     return result;
   }
+
   return {
     signed: false,
     message: `Publisher name does not match ${publishNames} and ${result.subject}`,
+    subject: result.subject,
   };
 }
