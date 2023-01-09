@@ -3,7 +3,7 @@ About
 
 This module is a wrapper for the WinVerifyTrust API. It is a native module and requires a C++ compiler to build. It is tested on Windows 10 and Windows 11.
 
-The module will get all keys refers to following table and compare them with the publisher info you provide. If they matches it will return null. If not, it will return the failed reason(type is string). You don't need to provide the whole publisher info, you can just provide the keys you want to compare.
+The module will get all keys refers to following table and compare them with the publisher info you provide. If they matches it will return signed=true. If not, it will return the failed reason(type is string). You don't need to provide the whole publisher info, you can just provide the keys you want to compare.
 
 ```js
 //  Key         Object Identifier               RDN Value Type(s)
