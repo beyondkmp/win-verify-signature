@@ -9,8 +9,6 @@ found in the LICENSE file in the root directory of this source tree.
 #define _UNICODE 1
 #define UNICODE 1
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <windows.h>
 #include <Softpub.h>
 #include <wincrypt.h>
@@ -387,4 +385,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
   return exports;
 }
 
-NODE_API_MODULE(NODE_GYP_MODULE_NAME, Init)
+#if NODE_MAJOR_VERSION >= 10
+NAN_MODULE_WORKER_ENABLED(check24HoursTimeModule, Init)
+#else
+NODE_API_MODULE(check24HoursTimeModule, Init);
+#endif
