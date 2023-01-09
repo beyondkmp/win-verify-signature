@@ -30,18 +30,12 @@ using namespace std;
 //  O           szOID_ORGANIZATION_NAME         Printable, Unicode
 //  OU          szOID_ORGANIZATIONAL_UNIT_NAME  Printable, Unicode
 //  E           szOID_RSA_emailAddr             Only IA5
-//  Email       szOID_RSA_emailAddr             Only IA5
 //  C           szOID_COUNTRY_NAME              Only Printable
 //  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
-//  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
 //  STREET      szOID_STREET_ADDRESS            Printable, Unicode
 //  T           szOID_TITLE                     Printable, Unicode
-//  Title       szOID_TITLE                     Printable, Unicode
 //  G           szOID_GIVEN_NAME                Printable, Unicode
-//  GN          szOID_GIVEN_NAME                Printable, Unicode
-//  GivenName   szOID_GIVEN_NAME                Printable, Unicode
 //  I           szOID_INITIALS                  Printable, Unicode
-//  Initials    szOID_INITIALS                  Printable, Unicode
 //  SN          szOID_SUR_NAME                  Printable, Unicode
 //  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
 //  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
@@ -60,29 +54,17 @@ static const LPCSTR PublisherAttributeObjId[] = {
     szOID_ORGANIZATIONAL_UNIT_NAME,
     //  E           szOID_RSA_emailAddr             Only IA5
     szOID_RSA_emailAddr,
-    //  Email       szOID_RSA_emailAddr             Only IA5
-    szOID_RSA_emailAddr,
     //  C           szOID_COUNTRY_NAME              Only Printable
     szOID_COUNTRY_NAME,
     //  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
-    szOID_STATE_OR_PROVINCE_NAME,
-    //  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
     szOID_STATE_OR_PROVINCE_NAME,
     //  STREET      szOID_STREET_ADDRESS            Printable, Unicode
     szOID_STREET_ADDRESS,
     //  T           szOID_TITLE                     Printable, Unicode
     szOID_TITLE,
-    //  Title       szOID_TITLE                     Printable, Unicode
-    szOID_TITLE,
     //  G           szOID_GIVEN_NAME                Printable, Unicode
     szOID_GIVEN_NAME,
-    //  GN          szOID_GIVEN_NAME                Printable, Unicode
-    szOID_GIVEN_NAME,
-    //  GivenName   szOID_GIVEN_NAME                Printable, Unicode
-    szOID_GIVEN_NAME,
     //  I           szOID_INITIALS                  Printable, Unicode
-    szOID_INITIALS,
-    //  Initials    szOID_INITIALS                  Printable, Unicode
     szOID_INITIALS,
     //  SN          szOID_SUR_NAME                  Printable, Unicode
     szOID_SUR_NAME,
@@ -123,36 +105,25 @@ static const LPCWSTR PublisherAttributeObjKey[] = {
     L"OU",
     //  E           szOID_RSA_emailAddr             Only IA5
     L"E",
-    //  Email       szOID_RSA_emailAddr             Only IA5
-    L"Email",
     //  C           szOID_COUNTRY_NAME              Only Printable
     L"C",
     //  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
     L"S",
-    //  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
-    L"ST",
     //  STREET      szOID_STREET_ADDRESS            Printable, Unicode
     L"STREET",
     //  T           szOID_TITLE                     Printable, Unicode
     L"T",
-    //  Title       szOID_TITLE                     Printable, Unicode
-    L"Title",
     //  G           szOID_GIVEN_NAME                Printable, Unicode
     L"G",
-    //  GN          szOID_GIVEN_NAME                Printable, Unicode
-    L"GN",
-    //  GivenName   szOID_GIVEN_NAME                Printable, Unicode
-    L"GivenName",
     //  I           szOID_INITIALS                  Printable, Unicode
     L"I",
-    //  Initials    szOID_INITIALS                  Printable, Unicode
-    L"Initials",
     //  SN          szOID_SUR_NAME                  Printable, Unicode
     L"SN",
     //  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
     L"DC",
     //  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
-    L"SERIALNUMBER"};
+    L"SERIALNUMBER"
+};
 
 #define PUBLISHER_ATTRIBUTE_LIST_CNT (sizeof(PublisherAttributeObjKey) / sizeof(PublisherAttributeObjKey[0]))
 

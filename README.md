@@ -13,18 +13,12 @@ The module will get all keys refers to following table and compare them with the
 //  O           szOID_ORGANIZATION_NAME         Printable, Unicode
 //  OU          szOID_ORGANIZATIONAL_UNIT_NAME  Printable, Unicode
 //  E           szOID_RSA_emailAddr             Only IA5
-//  Email       szOID_RSA_emailAddr             Only IA5
 //  C           szOID_COUNTRY_NAME              Only Printable
 //  S           szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
-//  ST          szOID_STATE_OR_PROVINCE_NAME    Printable, Unicode
 //  STREET      szOID_STREET_ADDRESS            Printable, Unicode
 //  T           szOID_TITLE                     Printable, Unicode
-//  Title       szOID_TITLE                     Printable, Unicode
 //  G           szOID_GIVEN_NAME                Printable, Unicode
-//  GN          szOID_GIVEN_NAME                Printable, Unicode
-//  GivenName   szOID_GIVEN_NAME                Printable, Unicode
 //  I           szOID_INITIALS                  Printable, Unicode
-//  Initials    szOID_INITIALS                  Printable, Unicode
 //  SN          szOID_SUR_NAME                  Printable, Unicode
 //  DC          szOID_DOMAIN_COMPONENT          IA5, UTF8
 //  SERIALNUMBER szOID_DEVICE_SERIAL_NUMBER     Only Printable
@@ -36,9 +30,9 @@ Example
 
 ```js
 
-const verify = require("win-verify-signature");
+import 'verifySignatureByPublishName' from 'win-verify-signature';
 
-console.log( verify.verifySignatureByPublishName("path/to/file", ["CN=\"Microsoft Corporation\",O=\"Microsoft Corporation\",L=Redmond,S=Washington,C=US"]) ); 
+console.log( verifySignatureByPublishName("path/to/file", ['CN="Microsoft Corporation",O="Microsoft Corporation",L=Redmond,S=Washington,C=US"'])); 
 
 /* Example: 
 {
@@ -51,13 +45,14 @@ console.log( verify.verifySignatureByPublishName("path/to/file", ["CN=\"Microsof
 
 ### types
 
-```
-declare interface IStatus {
-  signed: boolean,
-  message: string,
-  subject?: string
+```js
+declare interface ISignStatus {
+  signed: boolean;
+  message: string;
+  subject?: string;
 }
-export function verifySignatureByPublishName(filePath: string, publisherName: string[]): IStatus;
+
+export function verifySignatureByPublishName(filePath:string, publishNames:string[]):ISignStatus
 ```
 
 # Refer
