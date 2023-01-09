@@ -41,8 +41,10 @@ describe("getUserLocale", () => {
   it("verify not accepted file", () => {
     try {
       verifySignatureByPublishName(sample.ext, ["test is here"]);
-    } catch (e:any) {
-      expect(e.message).toEqual('Accepted file types are: .exe,.cab,.dll,.ocx,.msi,.msix,.xpi')
+    } catch (e: any) {
+      expect(e.message).toEqual(
+        "Accepted file types are: .exe,.cab,.dll,.ocx,.msi,.msix,.xpi"
+      );
     }
   });
 });
