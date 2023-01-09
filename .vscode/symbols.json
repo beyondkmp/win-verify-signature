@@ -16,7 +16,7 @@
   "files": {
     "types/index.d.ts": "2022-11-29T15:37:55.987Z",
     "types\\index.d.ts": "2022-12-23T02:02:48.774Z",
-    "dist\\index.d.ts": "2023-01-09T12:00:08.634Z",
+    "dist\\index.d.ts": "2023-01-09T12:04:21.409Z",
     "lib\\index.ts": "2023-01-09T11:58:23.712Z",
     "test\\smoke-test.ts": "2023-01-09T12:03:33.691Z"
   }
