@@ -30,7 +30,7 @@ Example
 
 ```js
 
-import 'verifySignatureByPublishName' from 'win-verify-signature';
+import { verifySignatureByPublishName } from 'win-verify-signature';
 
 console.log( verifySignatureByPublishName("path/to/file", ['CN="Microsoft Corporation",O="Microsoft Corporation",L=Redmond,S=Washington,C=US"'])); 
 

@@ -28,6 +28,18 @@ describe("getUserLocale", () => {
       subject:
         'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
     });
+
+    result = verifySignatureByPublishName(sample.signed, [
+      "Microsoft Corporation",
+    ]);
+
+    expect(result).toEqual({
+      signed: true,
+      message:
+        "Signature validated using only CN Microsoft Corporation. Please add your full Distinguished Name (DN) to publisherNames configuration",
+      subject:
+        'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
+    });
   });
 
   it("verify unsigned exe", () => {
