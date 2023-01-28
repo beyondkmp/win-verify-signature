@@ -130,14 +130,14 @@ export function verifySignatureByPublishName(
         return dn.get(key) === subject.get(key);
       });
     } else if (name === subject.get("CN")) {
-      result.message = `Signature validated using only CN ${name}. Please add your full Distinguished Name (DN) to publisherNames configuration`;
       match = true;
+    }
+
+    if (match) {
+      return result;
     }
   }
 
-  if (match) {
-    return result;
-  }
 
   return {
     signed: false,

@@ -36,7 +36,7 @@ describe("getUserLocale", () => {
     expect(result).toEqual({
       signed: true,
       message:
-        "Signature validated using only CN Microsoft Corporation. Please add your full Distinguished Name (DN) to publisherNames configuration",
+        "The file is signed and the signature was verified",
       subject:
         'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
     });
