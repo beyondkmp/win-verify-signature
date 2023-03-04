@@ -39,6 +39,8 @@ jobs:
 
       - name: Install and build dependencies
         run: yarn
+      - name: Prettify
+        run: yarn prettify
       - name: Lint
         run: yarn check-prettier
       - name: Build
