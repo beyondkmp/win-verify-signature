@@ -35,8 +35,7 @@ describe("getUserLocale", () => {
 
     expect(result).toEqual({
       signed: true,
-      message:
-        "The file is signed and the signature was verified",
+      message: "The file is signed and the signature was verified",
       subject:
         'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
     });

@@ -138,7 +138,6 @@ export function verifySignatureByPublishName(
     }
   }
 
-
   return {
     signed: false,
     message: `Publisher name does not match ${publishNames} and ${result.subject}`,

@@ -1,1 +1,15 @@
-{"symbols":{"ISignStatus":{"hasNamespace":false,"type":1,"moduleName":"index.d","relativePath":"dist\\index.d"}},"files":{"test\\smoke-test.ts":"2023-01-28T10:08:00.613Z","lib\\index.ts":"2023-01-28T10:03:49.695Z","dist\\index.d.ts":"2023-01-28T10:08:14.428Z"}}
+{
+  "symbols": {
+    "ISignStatus": {
+      "hasNamespace": false,
+      "type": 1,
+      "moduleName": "index.d",
+      "relativePath": "dist\\index.d"
+    }
+  },
+  "files": {
+    "test\\smoke-test.ts": "2023-01-28T10:08:00.613Z",
+    "lib\\index.ts": "2023-01-28T10:03:49.695Z",
+    "dist\\index.d.ts": "2023-01-28T10:08:14.428Z"
+  }
+}
