@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "v*"
+      - 'v*'
   pull_request:
 
 jobs:
@@ -29,10 +29,16 @@ jobs:
         with:
           node-version: 16.13.0
 
+      # This step can be removed as soon as official Windows arm64 builds are published:
+      # https://github.com/nodejs/build/issues/2450#issuecomment-705853342
+      - run: |
+          $NodeVersion = (node --version) -replace '^.'
+          $NodeFallbackVersion = "15.8.0"
+          & .\script\download-node-lib-win-arm64.ps1 $NodeVersion $NodeFallbackVersion
+        name: Install Windows arm64 node.lib
+
       - name: Install and build dependencies
         run: yarn
-      - name: prettify
-        run: yarn prettify
       - name: Lint
         run: yarn check-prettier
       - name: Build
@@ -41,6 +47,10 @@ jobs:
         run: yarn test
       - name: Prebuild x64
         run: yarn prebuild-napi-x64
+      - name: Prebuild arm64
+        run: yarn prebuild-napi-arm64
+      - name: Prebuild x86
+        run: yarn prebuild-napi-ia32
       - name: Publish
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: yarn upload ${{ secrets.GITHUB_TOKEN }}
