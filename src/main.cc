@@ -341,37 +341,39 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   {
     goto Cleanup;
   }
-
-  CRYPT_PROVIDER_DATA *pProvData = WTHelperProvDataFromStateData(WinTrustData.hWVTStateData);
-  if (NULL == pProvData)
-  {
-    result.Set("signed", false);
-    result.Set("message", "pProvData is null");
-    goto Cleanup;
-  }
-
-  //
-  // Get the signer
-  //
-
-  CRYPT_PROVIDER_SGNR *pProvSigner = WTHelperGetProvSignerFromChain(pProvData, 0, FALSE, 0);
-  if (NULL == pProvSigner)
-  {
-    result.Set("signed", false);
-    result.Set("message", "pProvSigner is null");
-    goto Cleanup;
-  }
-
-  signSubject = GetSignSubjectInfo(pProvSigner->pChainContext);
-  if (signSubject.empty())
-  {
-    result.Set("signed", false);
-    result.Set("message", "sign subject info is empty");
-    goto Cleanup;
-  }
   else
   {
-    result.Set("subject", WStringToString(signSubject));
+    CRYPT_PROVIDER_DATA *pProvData = WTHelperProvDataFromStateData(WinTrustData.hWVTStateData);
+    if (NULL == pProvData)
+    {
+      result.Set("signed", false);
+      result.Set("message", "pProvData is null");
+      goto Cleanup;
+    }
+
+    //
+    // Get the signer
+    //
+
+    CRYPT_PROVIDER_SGNR *pProvSigner = WTHelperGetProvSignerFromChain(pProvData, 0, FALSE, 0);
+    if (NULL == pProvSigner)
+    {
+      result.Set("signed", false);
+      result.Set("message", "pProvSigner is null");
+      goto Cleanup;
+    }
+
+    signSubject = GetSignSubjectInfo(pProvSigner->pChainContext);
+    if (signSubject.empty())
+    {
+      result.Set("signed", false);
+      result.Set("message", "sign subject info is empty");
+      goto Cleanup;
+    }
+    else
+    {
+      result.Set("subject", WStringToString(signSubject));
+    }
   }
 
 Cleanup:
