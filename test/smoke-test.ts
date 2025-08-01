@@ -1,5 +1,5 @@
 const path = require("path");
-import { verifySignatureByPublishName } from "../lib";
+import { verifySignatureByPublishName, verifySignatureByPublishNameAsync } from "../lib";
 
 const sample = {
   signed: path.resolve("./test/sample/signed.exe"),
@@ -55,6 +55,60 @@ describe("getUserLocale", () => {
   it("verify not accepted file", () => {
     try {
       verifySignatureByPublishName(sample.ext, ["test is here"]);
+    } catch (e: any) {
+      expect(e.message).toEqual(
+        "Accepted file types are: .exe,.cab,.dll,.ocx,.msi,.msix,.xpi"
+      );
+    }
+  });
+
+  it("verify signed exe async", async () => {
+    let result = await verifySignatureByPublishNameAsync(sample.signed, [
+      'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington"',
+    ]);
+    expect(result).toEqual({
+      signed: true,
+      message: "The file is signed and the signature was verified",
+      subject:
+        'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
+    });
+
+    result = await verifySignatureByPublishNameAsync(sample.signed, ["test is here"]);
+
+    expect(result).toEqual({
+      signed: false,
+      message:
+        'Publisher name does not match test is here and CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
+      subject:
+        'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
+    });
+
+    result = await verifySignatureByPublishNameAsync(sample.signed, [
+      "Microsoft Corporation",
+    ]);
+
+    expect(result).toEqual({
+      signed: true,
+      message: "The file is signed and the signature was verified",
+      subject:
+        'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington",SERIALNUMBER="230865+470561",',
+    });
+  });
+
+  it("verify unsigned exe async", async () => {
+    let result = await verifySignatureByPublishNameAsync(sample.unsigned, [
+      'CN="Microsoft Corporation",L="Redmond",O="Microsoft Corporation",OU="Microsoft Corporation",C="US",S="Washington"',
+    ]);
+    expect(result).toEqual({
+      message: "The file is not signed",
+      signed: false,
+      subject: "",
+    });
+  });
+
+  it("verify not accepted file async", async () => {
+    try {
+      await verifySignatureByPublishNameAsync(sample.ext, ["test is here"]);
     } catch (e: any) {
       expect(e.message).toEqual(
         "Accepted file types are: .exe,.cab,.dll,.ocx,.msi,.msix,.xpi"

@@ -221,29 +221,28 @@ static wstring GetSignSubjectInfo(
   return subject;
 }
 
-Napi::Object verifySignature(const Napi::CallbackInfo &info)
-{
-  Napi::Env env = info.Env();
-  int length = info.Length();
-  if (length != 1 || !info[0].IsString())
-    Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
-  Napi::String filePath = info[0].As<Napi::String>();
-  Napi::Object result = Napi::Object::New(env);
+// Structure to hold verification result
+struct VerificationResult {
+  bool isSigned;
+  std::string message;
+  std::string subject;
+  LONG status;
+};
 
-  std::wstring wrapper = StringToWString(filePath);
-  LPCWSTR pwszSourceFile = wrapper.c_str();
-  /*
-  From https://docs.microsoft.com/en-us/windows/win32/seccrypto/example-c-program--verifying-the-signature-of-a-pe-file
-  Copyright (C) Microsoft. All rights reserved.
-  No copyright or trademark infringement is intended in using the aforementioned Microsoft example.
-  */
+// Function to perform actual verification logic (extracted from original function)
+VerificationResult performSignatureVerification(const std::wstring& filePath) {
+  VerificationResult result;
+  result.isSigned = false;
+  result.message = "";
+  result.subject = "";
+  result.status = 0;
 
+  LPCWSTR pwszSourceFile = filePath.c_str();
   LONG lStatus;
   DWORD dwLastError;
   wstring signSubject;
 
   // Initialize the WINTRUST_FILE_INFO structure.
-
   WINTRUST_FILE_INFO FileData;
   memset(&FileData, 0, sizeof(FileData));
   FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
@@ -255,131 +254,210 @@ Napi::Object verifySignature(const Napi::CallbackInfo &info)
   WINTRUST_DATA WinTrustData;
 
   // Initialize the WinVerifyTrust input data structure.
-
   // Default all fields to 0.
   memset(&WinTrustData, 0, sizeof(WinTrustData));
 
   WinTrustData.cbStruct = sizeof(WinTrustData);
-  // Use default code signing EKU.
   WinTrustData.pPolicyCallbackData = NULL;
-  // No data to pass to SIP.
   WinTrustData.pSIPClientData = NULL;
-  // Disable WVT UI.
   WinTrustData.dwUIChoice = WTD_UI_NONE;
-  // No revocation checking.
   WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
-  // Verify an embedded signature on a file.
   WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
-  // Verify action.
   WinTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
-  // Verification sets this value.
   WinTrustData.hWVTStateData = NULL;
-
-  // Not used.
   WinTrustData.pwszURLReference = NULL;
-
-  // This is not applicable if there is no UI because it changes
-  // the UI to accommodate running applications instead of
-  // installing applications.
   WinTrustData.dwUIContext = 0;
-
-  // Set pFile.
   WinTrustData.pFile = &FileData;
 
-  // WinVerifyTrust verifies signatures as specified by the GUID
-  // and Wintrust_Data.
+  // WinVerifyTrust verifies signatures as specified by the GUID and Wintrust_Data.
   lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
+  result.status = lStatus;
 
-  result.Set("subject", "");
   switch (lStatus)
   {
   case ERROR_SUCCESS:
-    result.Set("signed", true);
-    result.Set("message", "The file is signed and the signature was verified");
+    result.isSigned = true;
+    result.message = "The file is signed and the signature was verified";
     break;
 
   case TRUST_E_NOSIGNATURE:
-    // The file was not signed or had a signature that was not valid.
-    // Get the reason for no signature.
     dwLastError = GetLastError();
     if (TRUST_E_NOSIGNATURE == dwLastError ||
         TRUST_E_SUBJECT_FORM_UNKNOWN == dwLastError ||
         TRUST_E_PROVIDER_UNKNOWN == dwLastError)
     {
-      result.Set("signed", false);
-      result.Set("message", "The file is not signed");
+      result.isSigned = false;
+      result.message = "The file is not signed";
     }
     else
     {
-      result.Set("signed", false);
-      result.Set("message", "An unknown error occurred trying to verify the signature of the file");
+      result.isSigned = false;
+      result.message = "An unknown error occurred trying to verify the signature of the file";
     }
     break;
 
   case TRUST_E_EXPLICIT_DISTRUST:
-    result.Set("signed", false);
-    result.Set("message", "The signature is present but specifically disallowed by the admin or user");
+    result.isSigned = false;
+    result.message = "The signature is present but specifically disallowed by the admin or user";
     break;
 
   case TRUST_E_SUBJECT_NOT_TRUSTED:
-    result.Set("signed", false);
-    result.Set("message", "The signature is present but not trusted");
+    result.isSigned = false;
+    result.message = "The signature is present but not trusted";
     break;
 
   case CRYPT_E_SECURITY_SETTINGS:
-    result.Set("signed", false);
-    result.Set("message", "The signature wasn't explicitly trusted by the admin and admin policy has disabled user trust. No signature, publisher or timestamp errors");
+    result.isSigned = false;
+    result.message = "The signature wasn't explicitly trusted by the admin and admin policy has disabled user trust. No signature, publisher or timestamp errors";
     break;
 
   default:
-    result.Set("signed", false);
-    result.Set("message", "The UI was disabled in dwUIChoice or the admin policy has disabled user trust");
+    result.isSigned = false;
+    result.message = "The UI was disabled in dwUIChoice or the admin policy has disabled user trust";
     break;
   }
 
-  if (lStatus != ERROR_SUCCESS)
-  {
-    goto Cleanup;
-  }
-  else
+  if (lStatus == ERROR_SUCCESS)
   {
     CRYPT_PROVIDER_DATA *pProvData = WTHelperProvDataFromStateData(WinTrustData.hWVTStateData);
-    if (NULL == pProvData)
+    if (pProvData != NULL)
     {
-      result.Set("signed", false);
-      result.Set("message", "pProvData is null");
-      goto Cleanup;
-    }
-
-    //
-    // Get the signer
-    //
-
-    CRYPT_PROVIDER_SGNR *pProvSigner = WTHelperGetProvSignerFromChain(pProvData, 0, FALSE, 0);
-    if (NULL == pProvSigner)
-    {
-      result.Set("signed", false);
-      result.Set("message", "pProvSigner is null");
-      goto Cleanup;
-    }
-
-    signSubject = GetSignSubjectInfo(pProvSigner->pChainContext);
-    if (signSubject.empty())
-    {
-      result.Set("signed", false);
-      result.Set("message", "sign subject info is empty");
-      goto Cleanup;
+      CRYPT_PROVIDER_SGNR *pProvSigner = WTHelperGetProvSignerFromChain(pProvData, 0, FALSE, 0);
+      if (pProvSigner != NULL)
+      {
+        signSubject = GetSignSubjectInfo(pProvSigner->pChainContext);
+        if (!signSubject.empty())
+        {
+          result.subject = WStringToString(signSubject);
+        }
+        else
+        {
+          result.isSigned = false;
+          result.message = "sign subject info is empty";
+        }
+      }
+      else
+      {
+        result.isSigned = false;
+        result.message = "pProvSigner is null";
+      }
     }
     else
     {
-      result.Set("subject", WStringToString(signSubject));
+      result.isSigned = false;
+      result.message = "pProvData is null";
     }
   }
 
-Cleanup:
-  // Any hWVTStateData must be released by a call with close.
+  // Cleanup: Any hWVTStateData must be released by a call with close.
   WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
-  lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
+  WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
+
+  return result;
+}
+
+// AsyncWorker class for signature verification
+class SignatureVerificationWorker : public Napi::AsyncWorker {
+public:
+  SignatureVerificationWorker(Napi::Function& callback, const std::string& filePath)
+    : Napi::AsyncWorker(callback), filePath_(filePath) {}
+
+  ~SignatureVerificationWorker() {}
+
+  // This code will be executed on the worker thread
+  void Execute() override {
+    try {
+      std::wstring wFilePath = StringToWString(filePath_);
+      result_ = performSignatureVerification(wFilePath);
+    } catch (const std::exception& e) {
+      SetError(std::string("Signature verification failed: ") + e.what());
+    } catch (...) {
+      SetError("Unknown error occurred during signature verification");
+    }
+  }
+
+  // This code will be executed on the main thread after Execute() completes
+  void OnOK() override {
+    Napi::HandleScope scope(Env());
+    
+    Napi::Object resultObj = Napi::Object::New(Env());
+    resultObj.Set("signed", result_.isSigned);
+    resultObj.Set("message", result_.message);
+    resultObj.Set("subject", result_.subject);
+
+    Callback().Call({Env().Null(), resultObj});
+  }
+
+  void OnError(const Napi::Error& e) override {
+    Napi::HandleScope scope(Env());
+    Callback().Call({e.Value(), Env().Undefined()});
+  }
+
+private:
+  std::string filePath_;
+  VerificationResult result_;
+};
+
+// Async version of verifySignature
+Napi::Value verifySignatureAsync(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+  int length = info.Length();
+  
+  if (length < 1 || !info[0].IsString()) {
+    Napi::TypeError::New(env, "String expected as first argument").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  std::string filePath = info[0].As<Napi::String>().Utf8Value();
+
+  // Check if callback is provided (callback style)
+  if (length >= 2 && info[1].IsFunction()) {
+    Napi::Function callback = info[1].As<Napi::Function>();
+    SignatureVerificationWorker* worker = new SignatureVerificationWorker(callback, filePath);
+    worker->Queue();
+    return env.Undefined();
+  }
+  
+  // Promise style
+  auto deferred = Napi::Promise::Deferred::New(env);
+  
+  auto callback = Napi::Function::New(env, [deferred](const Napi::CallbackInfo& info) {
+    if (info[0].IsNull()) {
+      // Success
+      deferred.Resolve(info[1]);
+    } else {
+      // Error
+      deferred.Reject(info[0]);
+    }
+    return info.Env().Undefined();
+  });
+
+  SignatureVerificationWorker* worker = new SignatureVerificationWorker(callback, filePath);
+  worker->Queue();
+  
+  return deferred.Promise();
+}
+
+// Original synchronous version (now using shared function)
+Napi::Object verifySignature(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  int length = info.Length();
+  if (length != 1 || !info[0].IsString())
+    Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
+  
+  Napi::String filePath = info[0].As<Napi::String>();
+  std::wstring wrapper = StringToWString(filePath);
+  
+  // Use the shared verification function
+  VerificationResult verifyResult = performSignatureVerification(wrapper);
+  
+  // Convert result to N-API object
+  Napi::Object result = Napi::Object::New(env);
+  result.Set("signed", verifyResult.isSigned);
+  result.Set("message", verifyResult.message);
+  result.Set("subject", verifyResult.subject);
+  
   return result;
 }
 
@@ -387,8 +465,8 @@ Cleanup:
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-
   exports.Set("verifySignature", Napi::Function::New(env, verifySignature));
+  exports.Set("verifySignatureAsync", Napi::Function::New(env, verifySignatureAsync));
   return exports;
 }
 

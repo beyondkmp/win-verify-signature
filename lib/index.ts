@@ -8,6 +8,7 @@ declare interface ISignStatus {
 
 type NativeModule = {
   verifySignature: (filePath: string) => ISignStatus;
+  verifySignatureAsync: (filePath: string) => Promise<ISignStatus>;
 };
 
 // The native binary will be loaded lazily to avoid any possible crash at start
@@ -116,6 +117,46 @@ export function verifySignatureByPublishName(
     throw Error(`Accepted file types are: ${allowed.join(",")}`);
   if (!fs.existsSync(filePath)) throw Error("Unable to locate target file");
   const result = getNativeModule().verifySignature(filePath);
+
+  if (result.signed === false) return result;
+
+  const subject = parseDn(result.subject);
+  let match = false;
+  for (const name of publishNames) {
+    const dn = parseDn(name);
+    if (dn.size) {
+      // if we have a full DN, compare all values
+      const allKeys = Array.from(dn.keys());
+      match = allKeys.every((key) => {
+        return dn.get(key) === subject.get(key);
+      });
+    } else if (name === subject.get("CN")) {
+      match = true;
+    }
+
+    if (match) {
+      return result;
+    }
+  }
+
+  return {
+    signed: false,
+    message: `Publisher name does not match ${publishNames} and ${result.subject}`,
+    subject: result.subject,
+  };
+}
+
+export async function verifySignatureByPublishNameAsync(
+  filePath: string,
+  publishNames: string[]
+): Promise<ISignStatus> {
+  const allowed = [".exe", ".cab", ".dll", ".ocx", ".msi", ".msix", ".xpi"];
+  const ext = path.extname(filePath);
+  if (!allowed.includes(ext))
+    throw Error(`Accepted file types are: ${allowed.join(",")}`);
+  if (!fs.existsSync(filePath)) throw Error("Unable to locate target file");
+  
+  const result = await getNativeModule().verifySignatureAsync(filePath);
 
   if (result.signed === false) return result;
 
