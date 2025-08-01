@@ -31,14 +31,6 @@ jobs:
         with:
           node-version: 22.17.0
 
-      # This step can be removed as soon as official Windows arm64 builds are published:
-      # https://github.com/nodejs/build/issues/2450#issuecomment-705853342
-      - run: |
-          $NodeVersion = (node --version) -replace '^.'
-          $NodeFallbackVersion = "22.17.0"
-          & .\script\download-node-lib-win-arm64.ps1 $NodeVersion $NodeFallbackVersion
-        name: Install Windows arm64 node.lib
-
       - name: Install and build dependencies
         run: yarn
 
