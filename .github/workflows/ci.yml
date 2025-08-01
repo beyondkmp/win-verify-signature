@@ -11,13 +11,13 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019]
+        os: [windows-latest]
         include:
-          - os: windows-2019
+          - os: windows-latest
             friendlyName: Windows
     timeout-minutes: 10
     steps:
